@@ -1,0 +1,11 @@
+Package: pbdistance
+Type: Package
+Title: Simple Point Count Distance Sampling
+Version: 0.1.0
+Author: Kristen Dybala
+Maintainer: Kristen Dybala <kdybala@pointblue.org>
+Description: A simple but customizable way of formatting point count data, fitting detection functions, and generating density or abundance estimates.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 5.0.1
+Imports: graphics, plyr, Distance, mrds
