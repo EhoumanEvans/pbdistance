@@ -6,15 +6,15 @@
 #' @param bins Vector of cutpoints for binned detections. See details.
 #' @param modlist List of detection curves to include in analysis. See details.
 #'
-#' @details This function will first subset a formatted point count data set (i.e. output from \code{format_data}) to a desired species and fit a standard list of detection curves to the data using detection bins. An AIC table comparing detection curve fits, including Akaike weight (w), whether fit was monotonic (mono), and the p-value from a chi-square goodness-of-fit test (chisq) will then be created and printed. Any models that are monotonic and have a chisq p-value>0.05 will be considered to have "good fit", and marked to be further considered (include = *). Of the included models, the function will plot the results of the one with the lowest AIC score and print density estimates by strata (individuals/ha). Take caution in accepting the goodness-of-fit test results, since the test weights all bins equally even though the first bins are the most important. Check the plot for good agreement between observed and predicted detections. It can be easy to pass the chi-square test with small sample sizes and poor agreement, yet difficult to pass with large sample sizes and very good agreement. If agreement is poor, or none of the models pass the chi-square test, consider lumping bins or reducing the maximum (truncation) distance.
+#' @details This function will first subset a formatted point count data set (i.e. output from \code{format_data}) to a desired species and fit a standard list of detection functions to the data using detection bins. An AIC table comparing detection function fits, including Akaike weight (w), whether fit was monotonic (mono), and the p-value from a chi-square goodness-of-fit test (chisq) will then be created and printed. Any models that are monotonic and have a chisq p-value>0.05 will be considered to have "good fit", and marked to be further considered (include = *). Of the included models, the function will plot the results of the one with the lowest AIC score and print density estimates by strata (individuals/ha). Take caution in accepting the goodness-of-fit test results, since the test weights all bins equally even though the first bins are the most important. Check the plot for good agreement between observed and predicted detections. It can be easy to pass the chi-square test with small sample sizes and poor agreement, yet difficult to pass with large sample sizes and very good agreement. If agreement is poor, or none of the models pass the chi-square test, consider lumping bins or reducing the maximum (truncation) distance.
 #'
 #' The value for \code{bins} defaults to the cutpoints for CADC protocol VCP25, bins = c(0,10,20,30,40,50,75,100), but cutpoints can be changed for other protocols and/or dropped to lump bins together as needed. Take care in changing cutpoints so that they align with the bins originally used to collect the data, particularly when combining data using more than one protocol. The function will not check whether your bins make sense for your data!
 #'
 #' The default list of detection functions to fit were originally derived from Thomas et al. 2010 J Appl Ecol 47:5-14. These include:
-#' - Uniform key with cosine adjustments of order 1 (unif.cos1) or 1,2 (unif.cos12)
-#' - Half-normal key with no adjustments (hn.null), and with cosine adjustments of order 2 (hn.cos2) or 2,3 (hn.cos23)
-#' - Hazard-rate key with no adjustments (hr.null), and with polynomial adjustments of order 2,4 (hr.poly24) or 2,4,6 (hr.poly246)
-#' A smaller subset of these models can be fit by specifying a vector of the names of the models to include in the \code{modlist} argument, as in: modlist=c('hn.null','hr.null). The function will pass the data and desired detection curve(s) to the \code{ds} function from package \code{Distance}, which produces copious output as each model is running. Occasionally, individual models will not fit, but those will be skipped and the other models will continue to run.
+#' - Uniform key with cosine adjustments (unif.cos)
+#' - Half-normal key with no or cosine adjustments (hn.cos)
+#' - Hazard-rate key with no or polynomial adjustments (hr.poly)
+#' These model names are passed to package \code{Distance}, which produces copious output as each model is running. \code{Distance} will start with no adjustment terms (or the simplest adjustments allowed) and then automatically tries higher order adjustments until it finds one with a higher AIC (poorer fit) than the one before it, and returns the previous model with the lowest AIC. Occasionally, individual models will not fit and will produce an error message, but those will be skipped and the other models will continue to run.
 #'
 #' @return Returns a named list including:
 #'
@@ -79,26 +79,16 @@ run_models = function(dat, maxdist=100, cuts=NULL, formula=~1, modlist) {
   results = list()
 
   ## uniform with cosine (can't use uniform key with no adjustments)
-  if ('unif.cos1' %in% modlist) {
-    results$unif.cos1 = try(Distance::ds(data=dat, transect='point', formula=formula, key='unif', adjustment='cos', order=1, cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
-  if ('unif.cos12' %in% modlist) {
-    results$unif.cos12 = try(Distance::ds(data=dat, transect='point', formula=formula, key='unif', adjustment='cos', order=c(1,2), cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+  if ('unif.cos' %in% modlist) {
+    results$unif.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='unif', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
 
   ## half-normal with cosine
-  if ('hn.null' %in% modlist) {
-    results$hn.null = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment=NULL, cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
-  if ('hn.cos2' %in% modlist) {
-    results$hn.cos2 = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment='cos', order=2, cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
-  if ('hn.cos23' %in% modlist) {
-    results$hn.cos23 = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment='cos', order=c(2,3), cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+  if ('hn.cos' %in% modlist) {
+    results$hn.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
 
   ## hazard rate with polynomial
-  if ('hr.null' %in% modlist) {
-    results$hr.null = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment=NULL, cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
-  if ('hr.poly24' %in% modlist) {
-    results$hr.poly24 = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment='poly', order=c(2,4), cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
-  if ('hr.poly246' %in% modlist) {
-    results$hr.poly246 = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment='poly', order=c(2,4,6), cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+  if ('hr.poly' %in% modlist) {
+    results$hr.poly = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment='poly', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
 
   x=which(lapply(1:length(results), function(x) {class(results[[x]])})=='try-error')
   if (length(x)>0) {results = results[-x]}
