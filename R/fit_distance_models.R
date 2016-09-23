@@ -17,9 +17,13 @@
 #' A smaller subset of these models can be fit by specifying a vector of the names of the models to include in the \code{modlist} argument, as in: modlist=c('hn.null','hr.null). The function will pass the data and desired detection curve(s) to the \code{ds} function from package \code{Distance}, which produces copious output as each model is running. Occasionally, individual models will not fit, but those will be skipped and the other models will continue to run.
 #'
 #' @return Returns a named list including:
+#'
 #' - The output of each model in \code{modlist}
+#'
 #' - \code{table}, containing the table of results printed
+#'
 #' - \code{D}, the density estimates (individuals/ha) for each stratum, calculated from the model with the lowest AIC score (of the models with include = *, see Details)
+#'
 #' - \code{N}, the estimated total number of individuals per stratum, calculated from the same model as for \code{D} above, based on extrapolating \code{D} by the \code{Area} of each stratum specified in \code{data}. If \code{Area}=1, then \code{N} = \code{D}.
 #'
 #' @author Kristen Dybala, \email{kdybala@@pointblue.org}

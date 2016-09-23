@@ -21,9 +21,13 @@ fit_distance_models(data, spec, maxdist = 100, bins = c(0, 10, 20, 30, 40,
 }
 \value{
 Returns a named list including:
+
 - The output of each model in \code{modlist}
+
 - \code{table}, containing the table of results printed
+
 - \code{D}, the density estimates (individuals/ha) for each stratum, calculated from the model with the lowest AIC score (of the models with include = *, see Details)
+
 - \code{N}, the estimated total number of individuals per stratum, calculated from the same model as for \code{D} above, based on extrapolating \code{D} by the \code{Area} of each stratum specified in \code{data}. If \code{Area}=1, then \code{N} = \code{D}.
 }
 \description{
