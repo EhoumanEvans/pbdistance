@@ -41,7 +41,7 @@ The value for \code{bins} defaults to the cutpoints for CADC protocol VCP25, bin
 The default list of detection functions to fit were originally derived from Thomas et al. 2010 J Appl Ecol 47:5-14. These include:
 - Uniform key with cosine adjustments of order 1 (unif.cos1) or 1,2 (unif.cos12)
 - Half-normal key with no adjustments (hn.null), and with cosine adjustments of order 2 (hn.cos2) or 2,3 (hn.cos23)
-- Hazard-rate key with no adjustments (hr.null), and with polynomial adjustments of order 2 (hr.poly2) or 2,4 (hr.poly24)
+- Hazard-rate key with no adjustments (hr.null), and with polynomial adjustments of order 2,4 (hr.poly24) or 2,4,6 (hr.poly246)
 A smaller subset of these models can be fit by specifying a vector of the names of the models to include in the \code{modlist} argument, as in: modlist=c('hn.null','hr.null). The function will pass the data and desired detection curve(s) to the \code{ds} function from package \code{Distance}, which produces copious output as each model is running. Occasionally, individual models will not fit, but those will be skipped and the other models will continue to run.
 }
 \examples{
