@@ -5,8 +5,7 @@
 \title{Fit detection curves to formatted data}
 \usage{
 fit_distance_models(data, spec, maxdist = 100, bins = c(0, 10, 20, 30, 40,
-  50, 75, 100), modlist = c("unif.cos1", "unif.cos12", "hn.null", "hn.cos2",
-  "hn.cos23", "hr.null", "hr.poly2", "hr.poly24", "hr.poly246"))
+  50, 75, 100), modlist = c("unif.cos", "hn.cos", "hr.poly"))
 }
 \arguments{
 \item{data}{Dataframe formatted for use with package \code{Distance}, e.g. output from \code{format_data}}

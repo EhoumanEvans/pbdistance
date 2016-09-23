@@ -35,7 +35,7 @@
 #' \dontrun{fdat = format.data(data=dat, strata='group')}
 
 fit_distance_models = function(data, spec, maxdist=100, bins=c(0,10,20,30,40,50,75,100),
-                               modlist=c('unif.cos1','unif.cos12','hn.null','hn.cos2','hn.cos23','hr.null','hr.poly2','hr.poly24','hr.poly246')) {
+                               modlist=c('unif.cos','hn.cos','hr.poly')) {
   distance = species = NULL
 
   ## list of unique surveys
