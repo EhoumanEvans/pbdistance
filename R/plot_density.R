@@ -1,7 +1,7 @@
 #' Plot results of distance sampling
 #'
 #' @param obj Model output from \code{fit_distance_models}
-#' @param type Type of output to plot, either \code{'D'} for density estimates or \code{'N'} for abundance estimates
+#' @param type Type of output to plot, either \code{D} for density estimates or \code{N} for abundance estimates. Default is \code{D}.
 #' @param year Defaults to \code{FALSE}. Change to \code{TRUE} if strata include estimates by year and you wish to plot trends.
 #'
 #' @return Returns a ggplot2 object for further customization.
@@ -15,7 +15,7 @@
 #' \dontrun{
 #' fdat = format_data(data=dat, strata='group')
 #' results = fit_distance_models(fdat, 'speciesname', bins=c(0,10,20,30,40,50,75,100))
-#' plot_dens(results, 'D', year=T) + theme_classic()
+#' plot_density(results, 'D', year=T) + theme_classic() + scale_color_manual(values=c('#682C7','#64AD34'))
 #' }
 #'
 plot_density = function(obj, type='D', year=F) {
