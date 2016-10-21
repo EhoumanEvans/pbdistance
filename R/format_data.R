@@ -141,9 +141,12 @@ format_data_flat = function(data, strata='Transect', year=NULL, strata.area=1, s
 translate_distance_bins = function(protocol='VCP25') {
   if(protocol=='VCP25') {
     key = data.frame(dist_bin_id = c('L10','L20','L30','L40','L50','G75','G00','B00','FLO'),
-                     distance = c(seq(5,45,10),62.5,82.5,110,NA))
+                     distance = c(seq(5,45,10),62.5,82.5,NA,NA))
+  } else if (protocol=='VCP10') {
+    key = data.frame(dist_bin_id = c('L10','L20','L30','L40','L50','G60','G70','G80','G90','G00','B00','FLO'),
+                     distance = c(seq(5,95,10),NA,NA))
   } else {
-    stop('Function under development. Distance bins currently only work with protocol VCP25. Instead, create numeric distance column representing midpoints of distance bins.')
+    stop('Function under development. Distance bins currently only work with protocols VCP25 and VCP10. Instead, create numeric distance column representing midpoints of distance bins.')
   }
   return (key)
 }
