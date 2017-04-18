@@ -5,6 +5,7 @@
 #' @param maxdist Maximum distance (in meters) to include in analysis, i.e. truncation distance
 #' @param bins Vector of cutpoints for binned detections. See details.
 #' @param modlist List of detection curves to include in analysis. See details.
+#' @param debug Debug level to pass to \code{Distance}. See details.
 #'
 #' @details This function will first subset a formatted point count data set (i.e. output from \code{format_data}) to a desired species and fit a standard list of detection functions to the data using detection bins. An AIC table comparing detection function fits, including Akaike weight (w), whether fit was monotonic (mono), and the p-value from a chi-square goodness-of-fit test (chisq) will then be created and printed. Any models that are monotonic and have a chisq p-value>0.05 will be considered to have "good fit", and marked to be further considered (include = *). Of the included models, the function will plot the results of the one with the lowest AIC score and print density estimates by strata (individuals/ha). Take caution in accepting the goodness-of-fit test results, since the test weights all bins equally even though the first bins are the most important. Check the plot for good agreement between observed and predicted detections. It can be easy to pass the chi-square test with small sample sizes and poor agreement, yet difficult to pass with large sample sizes and very good agreement. If agreement is poor, or none of the models pass the chi-square test, consider lumping bins or reducing the maximum (truncation) distance.
 #'
@@ -15,6 +16,8 @@
 #' - Half-normal key with no or cosine adjustments (hn.cos)
 #' - Hazard-rate key with no or polynomial adjustments (hr.poly)
 #' These model names are passed to package \code{Distance}, which produces copious output as each model is running. \code{Distance} will start with no adjustment terms (or the simplest adjustments allowed) and then automatically tries higher order adjustments until it finds one with a higher AIC (poorer fit) than the one before it, and returns the previous model with the lowest AIC. Occasionally, individual models will not fit and will produce an error message, but those will be skipped and the other models will continue to run.
+#'
+#' Debug level defaults to 0 (none), but can be set to values 1-3 for increasing levels of debugging output.
 #'
 #' @return Returns a named list including:
 #'
@@ -35,7 +38,7 @@
 #' \dontrun{fdat = format.data(data=dat, strata='group')}
 
 fit_distance_models = function(data, spec, maxdist=100, bins=c(0,10,20,30,40,50,75,100),
-                               modlist=c('unif.cos','hn.cos','hr.poly')) {
+                               modlist=c('unif.cos','hn.cos','hr.poly'), debug=0) {
   distance = species = NULL
 
   ## list of unique surveys
@@ -51,7 +54,7 @@ fit_distance_models = function(data, spec, maxdist=100, bins=c(0,10,20,30,40,50,
   ## append blank surveys with no detections of selected species
   sub = plyr::rbind.fill(sub, blank[-which(blank$surveyID %in% sub$surveyID),])
 
-  results <- run_models(sub, maxdist=maxdist, cuts=bins, modlist=modlist)
+  results <- run_models(sub, maxdist=maxdist, cuts=bins, modlist=modlist, debug=debug)
 
   results$table <- make_results_table(results)
 
@@ -72,7 +75,7 @@ fit_distance_models = function(data, spec, maxdist=100, bins=c(0,10,20,30,40,50,
   return(results)
 }
 
-run_models = function(dat, maxdist=100, cuts=NULL, formula=~1, modlist) {
+run_models = function(dat, maxdist=100, cuts=NULL, formula=~1, modlist, debug) {
   ## use convert.units=0.01 to convert distances in meters to 1/100 of the side of a hectare (100m x 100m)
   ##  --> resulting densities will be in individuals/hectare
   ## start with model combinations suggested by Thomas et al. 2010 J Appl Ecol 47:5-14
@@ -80,15 +83,15 @@ run_models = function(dat, maxdist=100, cuts=NULL, formula=~1, modlist) {
 
   ## uniform with cosine (can't use uniform key with no adjustments)
   if ('unif.cos' %in% modlist) {
-    results$unif.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='unif', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+    results$unif.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='unif', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01, debug.level=debug),TRUE)}
 
   ## half-normal with cosine
   if ('hn.cos' %in% modlist) {
-    results$hn.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+    results$hn.cos = try(Distance::ds(data=dat, transect='point', formula=formula, key='hn', adjustment='cos', cutpoints=cuts, truncation=maxdist, convert.units=0.01, debug.level=debug),TRUE)}
 
   ## hazard rate with polynomial
   if ('hr.poly' %in% modlist) {
-    results$hr.poly = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment='poly', cutpoints=cuts, truncation=maxdist, convert.units=0.01),TRUE)}
+    results$hr.poly = try(Distance::ds(data=dat, transect='point', formula=formula, key='hr', adjustment='poly', cutpoints=cuts, truncation=maxdist, convert.units=0.01, debug.level=debug),TRUE)}
 
   x=which(lapply(1:length(results), function(x) {class(results[[x]])})=='try-error')
   if (length(x)>0) {results = results[-x]}
