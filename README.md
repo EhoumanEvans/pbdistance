@@ -23,4 +23,11 @@ Example
 ``` r
 ## Example to be filled in here
 # library(pbdistance)
+# dat = read.csv()
+#
+# Step 1: format data; specify which column names refer to columns needed for analysis
+# fdat = format_data_flat(dat, strata='group', sample='point')
+#
+# Step 2: run models for an individual species, specifying cutpoints of distance bins used during surveys
+# m1 = run_distance_models(fdat, spec='BHCO', maxdist=100, bins=c(0,10,20,30,40,50,75,100))
 ```
