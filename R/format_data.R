@@ -124,7 +124,7 @@ format_data_flat = function(data, strata='Transect', year=NULL, strata.area=1, s
     fdat$flyover <- fdat[, which(colnames(fdat) == flyover)]
     fdat$flyover[fdat$flyover=='' | fdat$flyover==' '] <- NA
     if (any(!is.na(fdat$flyover))) { #flyovers detected
-      cat('\nLabels in', flyover, 'assumed to mark flyovers (and deleted):', unique(fdat$flyover))
+      cat('\nLabels in', flyover, 'assumed to mark flyovers (and deleted):', unique(as.character(fdat$flyover[!is.na(fdat$flyover)])))
       fdat <- fdat[-which(!is.na(fdat$flyover)),]
     }
   }
