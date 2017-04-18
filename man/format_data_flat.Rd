@@ -61,4 +61,3 @@ Any values in \code{flyover} other than '', ' ', or \code{NA} are assumed to fla
 \author{
 Kristen Dybala, \email{kdybala@pointblue.org}
 }
-

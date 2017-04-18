@@ -2,3 +2,4 @@
 
 export(fit_distance_models)
 export(format_data_flat)
+export(plot_density)
